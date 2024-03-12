@@ -33,9 +33,6 @@
     "mocha": "^8.1.3",
     "redis": "^3.0.2"
   },
-  "dependencies": {
-    "bluebird": "^3.7.2"
-  },
   "engines": {
     "node": ">=8.0.0"
   },
@@ -45,5 +42,8 @@
         "redlock.js"
       ]
     }
+  },
+  "dependencies": {
+    "bluebird": "^3.7.2"
   }
 }
