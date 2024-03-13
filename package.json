@@ -45,8 +45,5 @@
   },
   "dependencies": {
     "bluebird": "^3.7.2"
-  },
-  "publishConfig": {
-    "@gmsllc:registry": "https://npm.pkg.github.com"
   }
 }
