@@ -2,7 +2,7 @@
 
 var assert = require('chai').assert;
 var Promise = require('bluebird');
-var Redlock = require('./redlock');
+var Redlock = require('../redlock');
 
 test('single-server: https://www.npmjs.com/package/redis', [require('redis').createClient()]);
 test('single-server: https://www.npmjs.com/package/redis (string_numbers=true)', [require('redis').createClient({string_numbers: true})]);

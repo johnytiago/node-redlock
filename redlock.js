@@ -4,6 +4,7 @@ const util = require('util');
 const crypto = require('crypto');
 const Promise = require('bluebird');
 const EventEmitter = require('events');
+const { withCallback } = require('./withCallback');
 
 // constants
 const lockScript = `
@@ -61,6 +62,7 @@ const defaults = {
 	retryDelay:  200,
 	retryJitter: 100
 };
+
 
 
 
@@ -153,12 +155,9 @@ Redlock.LockError = LockError;
 Redlock.prototype.quit = function quit(callback) {
 
 	// quit all clients
-	return Promise.map(this.servers, function(client) {
+	return withCallback(Promise.map(this.servers, function(client) {
 		return client.quit();
-	})
-
-	// optionally run callback
-	.nodeify(callback);
+	}), callback);
 };
 
 
@@ -240,7 +239,7 @@ Redlock.prototype.unlock = function unlock(lock, callback) {
 	// immediately invalidate the lock
 	lock.expiration = 0;
 
-	return new Promise(function(resolve, reject) {
+	return withCallback(new Promise(function(resolve, reject) {
 
 		// the number of votes needed for consensus
 		const quorum = Math.floor(self.servers.length / 2) + 1;
@@ -281,10 +280,7 @@ Redlock.prototype.unlock = function unlock(lock, callback) {
 			// FAILURE: the lock could not be released
 			return reject(new LockError('Unable to fully release the lock on resource "' + lock.resource + '".'));
 		}
-	})
-
-	// optionally run callback
-	.nodeify(callback);
+	}), callback);
 };
 
 
@@ -296,20 +292,17 @@ Redlock.prototype.extend = function extend(lock, ttl, callback) {
 
 	// the lock has expired
 	if(lock.expiration < Date.now())
-		return Promise.reject(new LockError('Cannot extend lock on resource "' + lock.resource + '" because the lock has already expired.', 0)).nodeify(callback);
+		return withCallback(Promise.reject(new LockError('Cannot extend lock on resource "' + lock.resource + '" because the lock has already expired.', 0)), callback);
 
 	// extend the lock
-	return self._lock(lock.resource, lock.value, ttl, {})
+	return withCallback(self._lock(lock.resource, lock.value, ttl, {})
 
 	// modify and return the original lock object
 	.then(function(extension){
 		lock.value      = extension.value;
 		lock.expiration = extension.expiration;
 		return lock;
-	})
-
-	// optionally run callback
-	.nodeify(callback);
+	}), callback);
 };
 
 
@@ -356,7 +349,7 @@ Redlock.prototype._lock = function _lock(resource, value, ttl, options, callback
 	// array of locked resources
 	resource = Array.isArray(resource) ? resource : [resource];
 
-	return new Promise(function(resolve, reject) {
+	return withCallback(new Promise(function(resolve, reject) {
 		let request;
 
 		// the number of times we have attempted this lock
@@ -438,10 +431,7 @@ Redlock.prototype._lock = function _lock(resource, value, ttl, options, callback
 		}
 
 		return attempt();
-	})
-
-	// optionally run callback
-	.nodeify(callback);
+	}), callback);
 };
 
 
