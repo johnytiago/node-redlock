@@ -1,5 +1,5 @@
 {
-  "name": "redlock",
+  "name": "@gmsllc/redlock",
   "version": "4.2.1",
   "description": "A node.js redlock implementation for distributed redis locks",
   "main": "redlock.js",
